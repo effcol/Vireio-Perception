@@ -1,4 +1,4 @@
-﻿/********************************************************************
+/********************************************************************
 Vireio Perception: Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
@@ -53,23 +53,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <d3d11.h>
 #pragma comment(lib, "d3d11.lib")
 
-#include <D3DX11tex.h>
-#pragma comment(lib, "D3DX11.lib")
-
 #include <d3d10_1.h>
 #pragma comment(lib, "d3d10_1.lib")
 
 #include <d3d10.h>
 #pragma comment(lib, "d3d10.lib")
 
-#include <d3dx10.h>
-#pragma comment(lib, "d3dx10.lib")
-
 #include <d3d9.h>
 #pragma comment(lib, "d3d9.lib")
 
-#include <d3dx9.h>
-#pragma comment(lib, "d3dx9.lib")
+// Legacy <d3dxN.h> + <D3DX11tex.h> removed in v4.1; D3DX types/functions from
+// Vireio_D3DX_Compat.h. Texture loading via DirectXTex (vcpkg) where needed.
+#include"..\..\..\Include\Vireio_D3DX_Compat.h"
 
 #include"..//..//..//..//Aquilinus/Aquilinus/ITA_D3D9Interfaces.h"
 #include"..//..//..//..//Aquilinus/Aquilinus/VMT_IDirect3DDevice9.h"
@@ -364,7 +359,7 @@ public:
 	/*** AQU_Nodus public methods ***/
 	virtual const char* GetNodeType();
 	virtual        UINT GetNodeTypeId();
-	virtual      LPWSTR GetCategory();
+	virtual      LPCWSTR GetCategory();
 	virtual     HBITMAP GetLogo();
 	virtual      ImVec2 GetNodeSize() { return ImVec2((float)g_uGlobalNodeWidth, (float)128); }
 	virtual       DWORD GetSaveDataSize();
@@ -372,8 +367,8 @@ public:
 	virtual        void InitNodeData(char* pData, UINT dwSizeOfData);
 	virtual       DWORD GetCommandersNumber() { return NUMBER_OF_COMMANDERS; }
 	virtual       DWORD GetDecommandersNumber() { return NUMBER_OF_DECOMMANDERS; }
-	virtual      LPWSTR GetCommanderName(DWORD unCommanderIndex);
-	virtual      LPWSTR GetDecommanderName(DWORD unDecommanderIndex);
+	virtual      LPCWSTR GetCommanderName(DWORD unCommanderIndex);
+	virtual      LPCWSTR GetDecommanderName(DWORD unDecommanderIndex);
 	virtual       DWORD GetCommanderType(DWORD unCommanderIndex);
 	virtual       DWORD GetDecommanderType(DWORD unDecommanderIndex);
 	virtual       void* GetOutputPointer(DWORD unCommanderIndex);

@@ -47,23 +47,21 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <d3d11.h>
 #pragma comment(lib, "d3d11.lib")
 
-#include <D3DX11.h>
-#pragma comment(lib, "D3DX11.lib")
-
 #include <d3d10_1.h>
 #pragma comment(lib, "d3d10_1.lib")
 
 #include <d3d10.h>
 #pragma comment(lib, "d3d10.lib")
 
-#include <d3dx10.h>
-#pragma comment(lib, "d3dx10.lib")
-
 #include <d3d9.h>
 #pragma comment(lib, "d3d9.lib")
 
-#include <d3dx9.h>
-#pragma comment(lib, "d3dx9.lib")
+#include <d3dcompiler.h>
+#pragma comment(lib, "d3dcompiler.lib")
+
+// Legacy D3DX9 / D3DX10 / D3DX11 headers removed in v4.1 modernization;
+// types come from Vireio_D3DX_Compat.h (pulled via Vireio_DX11Basics.h below).
+// Math functions ported to DirectXMath; shader compile uses D3DCompile.
 
 #include"..\..\..\Include\Vireio_GUIDs.h"
 #include"..\..\..\Include\Vireio_DX11Basics.h"
@@ -101,13 +99,13 @@ public:
 	/*** VireioCinema public methods ***/
 	virtual const char*     GetNodeType();
 	virtual UINT            GetNodeTypeId();
-	virtual LPWSTR          GetCategory();
+	virtual LPCWSTR          GetCategory();
 	virtual HBITMAP         GetLogo();
 	virtual ImVec2          GetNodeSize() { return ImVec2((float)g_uGlobalNodeWidth, (float)128); }
 	virtual DWORD           GetCommandersNumber() { return NUMBER_OF_COMMANDERS; }
 	virtual DWORD           GetDecommandersNumber() { return NUMBER_OF_DECOMMANDERS; }
-	virtual LPWSTR          GetCommanderName(DWORD dwCommanderIndex);
-	virtual LPWSTR          GetDecommanderName(DWORD dwDecommanderIndex);
+	virtual LPCWSTR          GetCommanderName(DWORD dwCommanderIndex);
+	virtual LPCWSTR          GetDecommanderName(DWORD dwDecommanderIndex);
 	virtual DWORD           GetCommanderType(DWORD dwCommanderIndex);
 	virtual DWORD           GetDecommanderType(DWORD dwDecommanderIndex);
 	virtual void*           GetOutputPointer(DWORD dwCommanderIndex);

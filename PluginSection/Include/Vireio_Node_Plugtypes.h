@@ -36,7 +36,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include<d3d10_1.h>
 #include<d3d10.h>
 #include<d3d9.h>
-#include<d3dx9.h>
+// legacy <d3dx9.h> removed; D3DX types come from Vireio_D3DX_Compat.h
+#include"Vireio_D3DX_Compat.h"
 #include"..//..//Aquilinus/Aquilinus//AQU_NodesStructures.h"
 #include"..\..\..\Include\VireioMenu.h"
 #include"..\VireioCore\VireioMatrixModifier\VireioMatrixModifier\VireioMatrixModifierDataStructures.h"
@@ -88,7 +89,7 @@ namespace VLink
 	/// </summary>
 	/// <param name="nLink">enumeration id</param>
 	/// <returns>Name String</returns>
-	constexpr LPWSTR Name(_L nLink)
+	constexpr LPCWSTR Name(_L nLink)
 	{
 		switch (nLink)
 		{

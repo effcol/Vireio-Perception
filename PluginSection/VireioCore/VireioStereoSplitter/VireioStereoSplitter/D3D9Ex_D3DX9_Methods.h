@@ -38,8 +38,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <d3d9.h>
 #pragma comment(lib, "d3d9.lib")
 
-#include <d3dx9.h>
-#pragma comment(lib, "d3dx9.lib")
+// Legacy <d3dx9.h> removed; types/shims from Vireio_D3DX_Compat.h
+#include "..\..\..\Include\Vireio_D3DX_Compat.h"
 
 #pragma region D3DXFillTexture
 /**

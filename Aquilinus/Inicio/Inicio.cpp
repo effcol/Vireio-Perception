@@ -3,7 +3,7 @@ Vireio Perception : Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
 Aquilinus : Vireio Perception 3D Modification Studio
-Copyright � 2014 Denis Reischl
+Copyright � 2014 Denis Reischl
 
 Vireio Perception Version History:
 v1.0.0 2012 by Andres Hernandez
@@ -1065,6 +1065,37 @@ void MouseButton_callback(GLFWwindow* window, int button, int action, int mods) 
 }
 
 /// <summary>
+/// => Inicio CLI flag parser (S4.1).
+/// Recognises:
+///   --workspace "C:\path\to\Game.aqu"   Pre-loads workspace file path.
+///   --target    GameExe.exe             Pre-sets the process to inject into.
+///   --autorun                           Triggers the Load+Inject flow on startup
+///                                       (no user click required).
+/// Unknown flags are ignored. Used by Stereopticon's modules/adapters/vireio.js
+/// to drive Inicio headlessly. Returns true if --autorun was requested.
+/// </summary>
+static bool ParseInicioCli(std::wstring& outWorkspace, std::wstring& outTarget)
+{
+	bool bAutorun = false;
+	int   nArgs = 0;
+	LPWSTR* argv = CommandLineToArgvW(GetCommandLineW(), &nArgs);
+	if (!argv) return false;
+	// argv[0] is the exe path — skip it
+	for (int i = 1; i < nArgs; ++i)
+	{
+		const std::wstring arg = argv[i];
+		if (arg == L"--workspace" && (i + 1) < nArgs)
+			outWorkspace = argv[++i];
+		else if (arg == L"--target" && (i + 1) < nArgs)
+			outTarget = argv[++i];
+		else if (arg == L"--autorun")
+			bAutorun = true;
+	}
+	LocalFree(argv);
+	return bAutorun;
+}
+
+/// <summary>
 /// => Inicio main windows entry point.
 /// </summary>
 int __stdcall WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPSTR lpCmdLine, _In_ int nCmdShow)
@@ -1076,6 +1107,10 @@ int __stdcall WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 		OutputDebugString(L"Aquilinus injection app is already present !");
 		return 0;
 	}
+
+	// parse CLI flags before init so the autorun path can short-circuit the UI (S4.1)
+	std::wstring szCliWorkspace, szCliTarget;
+	const bool bCliAutorun = ParseInicioCli(szCliWorkspace, szCliTarget);
 
 	// init
 	OutputDebugString(L"Inicio : Started...");
@@ -1141,6 +1176,31 @@ int __stdcall WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	// create file manager
 	g_pFileManager = new AQU_FileManager(g_pAquilinusConfig);
 
+	// S4.1 — seed config from CLI flags. We populate workspace path + (optionally)
+	// process index here, before the render loop, so the same Load-button logic
+	// can be triggered from the autorun path below without any UI interaction.
+	if (!szCliWorkspace.empty())
+	{
+		const size_t nCopy = std::min<size_t>(szCliWorkspace.size(), MAX_PATH - 1);
+		wcsncpy_s(g_pAquilinusConfig->szWorkspaceFilePath, szCliWorkspace.c_str(), nCopy);
+		g_pAquilinusConfig->szWorkspaceFilePath[nCopy] = L'\0';
+		OutputDebugString(L"Inicio : --workspace ");
+		OutputDebugString(g_pAquilinusConfig->szWorkspaceFilePath);
+	}
+	if (!szCliTarget.empty())
+	{
+		// Stash the target exe name in szProcessName. The Compiled-load path
+		// already uses this field; the autorun path matches it to the running
+		// process list inside LoadWorkingAreaBasics → g_pFileManager.
+		const size_t nMax  = MAX_JOLIET_FILENAME - 1;
+		const size_t nCopy = std::min<size_t>(szCliTarget.size(), nMax);
+		wcsncpy_s(g_pAquilinusConfig->szProcessName, szCliTarget.c_str(), nCopy);
+		g_pAquilinusConfig->szProcessName[nCopy] = L'\0';
+		g_bKeepProcessName = true;
+		OutputDebugString(L"Inicio : --target ");
+		OutputDebugString(g_pAquilinusConfig->szProcessName);
+	}
+
 	// load or create options file
 	std::ifstream configRead("Aquilinus.cfg");
 	
@@ -1205,9 +1265,57 @@ int __stdcall WinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance
 	ImGui_StyleColorsByScheme();
 	ImVec4 clear_color = ImGui::GetStyle().Colors[ImGuiCol_WindowBg];
 
+	// S4.1 — autorun latch. Set true after the first render-loop iteration
+	// when --autorun was requested; replays the Load button logic exactly once.
+	bool bCliAutorunPending = bCliAutorun && !szCliWorkspace.empty();
+
 	// => <main> render loop
 	while (!glfwWindowShouldClose(window))
 	{
+		// S4.1 — autorun: same flow as the Load button in ImGui_Main().
+		// Fires once on the first iteration so glfw/ImGui contexts are live.
+		if (bCliAutorunPending)
+		{
+			bCliAutorunPending = false;
+			ForceIdle();
+			wchar_t szCurrentPath[MAX_PATH];
+			GetCurrentDirectory(MAX_PATH, szCurrentPath);
+			DWORD dwSupportedInterfacesNumber;
+			DWORD dwProcessIndexOld   = g_pAquilinusConfig->dwProcessIndex;
+			DWORD dwDetourTimeDelayOld = g_pAquilinusConfig->dwDetourTimeDelay;
+			if (SUCCEEDED(g_pFileManager->LoadWorkingAreaBasics(
+				g_pAquilinusConfig->szWorkspaceFilePath,
+				g_pAquilinusConfig->dwProcessIndex,
+				dwSupportedInterfacesNumber,
+				(int*)g_pAquilinusConfig->eInjectionTechnique,
+				g_pAquilinusConfig->szPictureFilePath,
+				g_pAquilinusConfig->bProfileWindow,
+				g_pAquilinusConfig->dwDetourTimeDelay,
+				g_pAquilinusConfig->nInjectionRepetition,
+				g_bKeepProcessName)))
+			{
+				if (g_bKeepProcessName)
+				{
+					g_pAquilinusConfig->dwProcessIndex    = dwProcessIndexOld;
+					g_pAquilinusConfig->dwDetourTimeDelay = dwDetourTimeDelayOld;
+				}
+				SetCurrentDirectory(szCurrentPath);
+				g_eInicioStatus = InicioStatus::Injecting;
+				g_pAquilinusConfig->eProjectStage = AQU_ProjectStage::WorkingAreaLoad;
+				g_nRepeat = g_pAquilinusConfig->nInjectionRepetition;
+				g_hInjectionThread = CreateThread(NULL, 0, InjectionThread, &g_nRepeat, 0, NULL);
+				if (g_hInjectionThread == NULL)
+					OutputDebugString(L"Inicio : --autorun failed to create injection thread !");
+				else
+					OutputDebugString(L"Inicio : --autorun started injection thread");
+			}
+			else
+			{
+				OutputDebugString(L"Inicio : --autorun LoadWorkingAreaBasics failed");
+				g_eInicioStatus = InicioStatus::Idle;
+			}
+		}
+
 		// create the abort event
 		if (g_hInjectionAbortEvent) CloseHandle(g_hInjectionAbortEvent);
 		g_hInjectionAbortEvent = CreateEvent(

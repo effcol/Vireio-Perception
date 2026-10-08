@@ -274,7 +274,8 @@ void bindTexture(GLuint& uTxId, GLsizei uW, GLsizei uH, unsigned char* rgbpix)
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, uW, uH, 0, GL_RGB, GL_UNSIGNED_BYTE, rgbpix);
-	gluBuild2DMipmaps(GL_TEXTURE_2D, GL_RGBA, uW, uH, GL_RGB, GL_UNSIGNED_BYTE, rgbpix);
+	// v4.1 modernization: gluBuild2DMipmaps -> modern GL glGenerateMipmap (no GLU dep).
+	glGenerateMipmap(GL_TEXTURE_2D);
 }
 
 #pragma endregion 

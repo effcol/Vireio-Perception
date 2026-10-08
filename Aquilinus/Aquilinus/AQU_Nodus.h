@@ -3,7 +3,7 @@ Vireio Perception : Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
 Aquilinus : Vireio Perception 3D Modification Studio
-Copyright © 2014 Denis Reischl
+Copyright ï¿½ 2014 Denis Reischl
 
 Vireio Perception Version History:
 v1.0.0 2012 by Andres Hernandez
@@ -50,7 +50,7 @@ public:
 	/*** AQU_Nodus public methods ***/
 	virtual     const char* GetNodeType() { return typeid(this).name(); }
 	virtual          UINT32 GetNodeTypeId() { return NULL; }
-	virtual          LPWSTR GetCategory() { return L""; }
+	virtual         LPCWSTR GetCategory() { return L""; }
 	virtual         HBITMAP GetLogo() { return nullptr; }
 	virtual          ImVec2 GetNodeSize() { return ImVec2(100.f, 100.f); }
 	virtual             int GetProvokingType() { return 0; }
@@ -60,8 +60,8 @@ public:
 	virtual            void InitNodeData(char* pData, UINT dwSizeOfData) { (pData); (dwSizeOfData); }
 	virtual           DWORD GetCommandersNumber() { return 0; }
 	virtual           DWORD GetDecommandersNumber() { return 0; }
-	virtual          LPWSTR GetCommanderName(DWORD dwCommanderIndex) { return L""; }
-	virtual          LPWSTR GetDecommanderName(DWORD dwDecommanderIndex) { return L""; }
+	virtual         LPCWSTR GetCommanderName(DWORD dwCommanderIndex) { return L""; }
+	virtual         LPCWSTR GetDecommanderName(DWORD dwDecommanderIndex) { return L""; }
 	virtual           DWORD GetCommanderType(DWORD dwCommanderIndex) { return 0; }
 	virtual           DWORD GetDecommanderType(DWORD dwDecommanderIndex) { return 0; }
 	virtual           void* GetOutputPointer(DWORD dwCommanderIndex) { return nullptr; }

@@ -37,6 +37,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #ifndef _TRACE
 #define TRACE_UINT(a) { wchar_t buf[128]; wsprintf(buf, L"%s:%u", L#a, a); OutputDebugString(buf); }
+#define TRACE_UINT_EX(label, value) { wchar_t buf[128]; wsprintf(buf, L"%s:%u", label, (UINT)(value)); OutputDebugString(buf); }
 #define TRACE_HEX(a) { wchar_t buf[128]; wsprintf(buf, L"%s:%x", L#a, a); OutputDebugString(buf); }
 #define TRACE_LINE { wchar_t buf[128]; wsprintf(buf, L"LINE : %d", __LINE__); OutputDebugString(buf); }
 #endif
@@ -209,7 +210,7 @@ UINT StereoSplitter::GetNodeTypeId()
 /**
 * Returns the name of the category for the Stereo Splitter node.
 ***/
-LPWSTR StereoSplitter::GetCategory()
+LPCWSTR StereoSplitter::GetCategory()
 {
 	return L"Vireio Core";
 }
@@ -274,7 +275,7 @@ void StereoSplitter::InitNodeData(char* pData, UINT dwSizeOfData)
 /**
 * Provides the name of the requested commander.
 ***/
-LPWSTR StereoSplitter::GetCommanderName(DWORD unCommanderIndex)
+LPCWSTR StereoSplitter::GetCommanderName(DWORD unCommanderIndex)
 {
 	switch ((STS_Commanders)unCommanderIndex)
 	{
@@ -290,7 +291,7 @@ LPWSTR StereoSplitter::GetCommanderName(DWORD unCommanderIndex)
 /**
 * Provides the name of the requested decommander.
 ***/
-LPWSTR StereoSplitter::GetDecommanderName(DWORD unDecommanderIndex)
+LPCWSTR StereoSplitter::GetDecommanderName(DWORD unDecommanderIndex)
 {
 	switch ((STS_Decommanders)unDecommanderIndex)
 	{
@@ -1166,7 +1167,7 @@ void* StereoSplitter::Provoke(void* pThis, int eD3D, int eD3DInterface, int eD3D
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZENABLE, FALSE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
-						((IDirect3DDevice9*)pThis)->DrawPrimitiveUP(D3DPT_POINTLIST, 1, vDummyPoint, sizeof(D3DXVECTOR3));
+						((IDirect3DDevice9*)pThis)->DrawPrimitiveUP(D3DPT_POINTLIST, 1, &vDummyPoint, sizeof(D3DXVECTOR3));
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZENABLE, TRUE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0F);
@@ -1184,7 +1185,7 @@ void* StereoSplitter::Provoke(void* pThis, int eD3D, int eD3DInterface, int eD3D
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZENABLE, FALSE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_COLORWRITEENABLE, 0);
-						((IDirect3DDevice9*)pThis)->DrawPrimitiveUP(D3DPT_POINTLIST, 1, vDummyPoint, sizeof(D3DXVECTOR3));
+						((IDirect3DDevice9*)pThis)->DrawPrimitiveUP(D3DPT_POINTLIST, 1, &vDummyPoint, sizeof(D3DXVECTOR3));
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_ZENABLE, TRUE);
 						((IDirect3DDevice9*)pThis)->SetRenderState(D3DRS_COLORWRITEENABLE, 0x0F);
@@ -2393,18 +2394,18 @@ bool StereoSplitter::SetDrawingSide(IDirect3DDevice9* pcDevice, RenderPosition e
 		if (m_psModifierData->bViewSet)
 		{
 			if (eSide == RenderPosition::Left)
-				pcDevice->SetTransform(D3DTS_VIEW, &m_psModifierData->sMatView[0]);
+				pcDevice->SetTransform(D3DTS_VIEW, reinterpret_cast<const D3DMATRIX*>(&m_psModifierData->sMatView[0]));
 			else
-				pcDevice->SetTransform(D3DTS_VIEW, &m_psModifierData->sMatView[1]);
+				pcDevice->SetTransform(D3DTS_VIEW, reinterpret_cast<const D3DMATRIX*>(&m_psModifierData->sMatView[1]));
 		}
 
-		// update projection transform for new side 
+		// update projection transform for new side
 		if (m_psModifierData->bProjSet)
 		{
 			if (eSide == RenderPosition::Left)
-				pcDevice->SetTransform(D3DTS_PROJECTION, &m_psModifierData->sMatProj[0]);
+				pcDevice->SetTransform(D3DTS_PROJECTION, reinterpret_cast<const D3DMATRIX*>(&m_psModifierData->sMatProj[0]));
 			else
-				pcDevice->SetTransform(D3DTS_PROJECTION, &m_psModifierData->sMatProj[1]);
+				pcDevice->SetTransform(D3DTS_PROJECTION, reinterpret_cast<const D3DMATRIX*>(&m_psModifierData->sMatProj[1]));
 		}
 
 		// set shader constants to new side, first vertex shader

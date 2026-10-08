@@ -99,11 +99,11 @@ m_unMenuModelIndex(0)
 	m_pcTexCopy11SRV[0] = nullptr;
 	m_pcTexCopy11SRV[1] = nullptr;
 
-	D3DXMatrixIdentity(&m_sView);
-	D3DXMatrixIdentity(&m_sToEye[0]);
-	D3DXMatrixIdentity(&m_sToEye[1]);
-	D3DXMatrixIdentity(&m_sProj[0]);
-	D3DXMatrixIdentity(&m_sProj[1]);
+	XMStoreFloat4x4(&m_sView, XMMatrixIdentity());
+	XMStoreFloat4x4(&m_sToEye[0], XMMatrixIdentity());
+	XMStoreFloat4x4(&m_sToEye[1], XMMatrixIdentity());
+	XMStoreFloat4x4(&m_sProj[0], XMMatrixIdentity());
+	XMStoreFloat4x4(&m_sProj[1], XMMatrixIdentity());
 
 	// locate or create the INI file
 	char szFilePathINI[1024];
@@ -539,7 +539,7 @@ UINT VireioCinema::GetNodeTypeId()
 /**
 * Returns the name of the category for the Vireio Cinema node.
 ***/
-LPWSTR VireioCinema::GetCategory()
+LPCWSTR VireioCinema::GetCategory()
 {
 	return L"Virtual Reality";
 }
@@ -557,7 +557,7 @@ HBITMAP VireioCinema::GetLogo()
 /**
 * Provides the name of the requested decommander.
 ***/
-LPWSTR VireioCinema::GetCommanderName(DWORD dwCommanderIndex)
+LPCWSTR VireioCinema::GetCommanderName(DWORD dwCommanderIndex)
 {
 	switch ((VRC_Commanders)dwCommanderIndex)
 	{
@@ -571,7 +571,7 @@ LPWSTR VireioCinema::GetCommanderName(DWORD dwCommanderIndex)
 /**
 * Provides the name of the requested decommander.
 ***/
-LPWSTR VireioCinema::GetDecommanderName(DWORD dwDecommanderIndex)
+LPCWSTR VireioCinema::GetDecommanderName(DWORD dwDecommanderIndex)
 {
 	switch ((VRC_Decommanders)dwDecommanderIndex)
 	{
@@ -787,10 +787,10 @@ void* VireioCinema::Provoke(void* pThis, int eD3D, int eD3DInterface, int eD3DMe
 		// transform direction vector using this matrix and normalize it, negate
 		D3DXVECTOR3 sDirectionZ = D3DXVECTOR3(0.0f, 0.0f, 1.0f);
 		D3DXVECTOR4 sDirection;
-		D3DXVec3Transform(&sDirection, &sDirectionZ, &m_sMenu.sPoseMatrix[uHand]);
+		XMStoreFloat4(&sDirection, XMVector3Transform(XMLoadFloat3(&sDirectionZ), XMLoadFloat4x4(&m_sMenu.sPoseMatrix[uHand])));
 		sDirection.x *= -1.0f;
 		sDirection.y *= -1.0f;
-		D3DXVec4Normalize(&sDirection, &sDirection);
+		XMStoreFloat4(&sDirection, XMVector4Normalize(XMLoadFloat4(&sDirection)));
 		float fPlaneDistanceZ = m_sMenu.sPosition[uHand].z + m_sCinemaRoomSetup.fScreenDepth;
 
 		// get intersection point to screen...
@@ -1261,13 +1261,13 @@ void VireioCinema::InitD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCont
 			for (INT nEye = 0; nEye < 2; nEye++)
 			{
 				// get the projection matrix for each eye
-				D3DXMatrixPerspectiveFovLH(&m_sProj[nEye], (float)D3DXToRadian(116.0), 1.0f, 0.1f, 30.0f);
+				XMStoreFloat4x4(&m_sProj[nEye], XMMatrixPerspectiveFovLH((float)D3DXToRadian(116.0), 1.0f, 0.1f, 30.0f));
 
-				// create eye pose matrix... 
+				// create eye pose matrix...
 				if (nEye)
-					D3DXMatrixTranslation(&m_sToEye[nEye], -m_sImmersiveFullscreenSettings.fIPD / 2.0f, 0, 0);
+					XMStoreFloat4x4(&m_sToEye[nEye], XMMatrixTranslation(-m_sImmersiveFullscreenSettings.fIPD / 2.0f, 0, 0));
 				else
-					D3DXMatrixTranslation(&m_sToEye[nEye], m_sImmersiveFullscreenSettings.fIPD / 2.0f, 0, 0);
+					XMStoreFloat4x4(&m_sToEye[nEye], XMMatrixTranslation(m_sImmersiveFullscreenSettings.fIPD / 2.0f, 0, 0));
 			}
 		}
 	}
@@ -1592,7 +1592,7 @@ void VireioCinema::InitD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCont
 			for (UINT unIx = 0; unIx < 12; unIx++)
 			{
 				D3DXVECTOR3 sCopy = {};
-				D3DXVec3Normalize(&sCopy, &asVertices[12].sNormal);
+				XMStoreFloat3(&sCopy, XMVector3Normalize(XMLoadFloat3(&asVertices[12].sNormal)));
 				asVertices[12].sNormal = sCopy;
 			}
 
@@ -1813,7 +1813,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 		D3DXVECTOR3 sEye = D3DXVECTOR3(0.0f, 1.8f, 0.0f);
 		D3DXVECTOR3 sAt = D3DXVECTOR3(0.0f, 1.5f, 1.0f);
 		D3DXVECTOR3 sUp = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
-		D3DXMatrixLookAtLH(&m_sView, &sEye, &sAt, &sUp);
+		XMStoreFloat4x4(&m_sView, XMMatrixLookAtLH(XMLoadFloat3(&sEye), XMLoadFloat3(&sAt), XMLoadFloat3(&sUp)));
 	}
 
 	// Update and set our time
@@ -1878,11 +1878,11 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 	// set screen world matrix
 	D3DXMATRIX sWorld, sRotateX, sRotateY, sTrans, sScale;
 	float fScale = m_sCinemaRoomSetup.fScreenWidth / 6.0f; // default screen width 6.0 m
-	D3DXMatrixScaling(&sScale, fScale, fScale, fScale);
-	D3DXMatrixRotationX(&sRotateX, (float)D3DXToRadian((double)m_sCinemaRoomSetup.fScreenRotateX));
-	D3DXMatrixRotationY(&sRotateY, (float)D3DXToRadian((double)m_sCinemaRoomSetup.fScreenRotateY));
-	D3DXMatrixTranslation(&sTrans, 0.0f, m_sCinemaRoomSetup.fScreenLevel, m_sCinemaRoomSetup.fScreenDepth);
-	sWorld = sScale * sRotateX * sTrans * sRotateY;
+	XMStoreFloat4x4(&sScale, XMMatrixScaling(fScale, fScale, fScale));
+	XMStoreFloat4x4(&sRotateX, XMMatrixRotationX((float)D3DXToRadian((double)m_sCinemaRoomSetup.fScreenRotateX)));
+	XMStoreFloat4x4(&sRotateY, XMMatrixRotationY((float)D3DXToRadian((double)m_sCinemaRoomSetup.fScreenRotateY)));
+	XMStoreFloat4x4(&sTrans, XMMatrixTranslation(0.0f, m_sCinemaRoomSetup.fScreenLevel, m_sCinemaRoomSetup.fScreenDepth));
+	sWorld = sScale * sRotateX * sTrans * sRotateY;  // operator* defined in Vireio_D3DX_Compat.h
 
 	// buffer data
 	UINT stride = sizeof(TexturedNormalVertex);
@@ -1905,7 +1905,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 		pcContext->IASetIndexBuffer(m_asRenderModels[unI].pcIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 		// set world matrix and render target resolution
-		D3DXMatrixTranspose(&m_sGeometryConstants.sWorld, &sWorld);
+		XMStoreFloat4x4(&m_sGeometryConstants.sWorld, XMMatrixTranspose(XMLoadFloat4x4(&sWorld)));
 		m_sGeometryConstants.sResolution.x = (float)m_asRenderModels[unI].sResolution.unWidth;
 		m_sGeometryConstants.sResolution.y = (float)m_asRenderModels[unI].sResolution.unHeight;
 
@@ -1930,25 +1930,25 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 
 				// setup view matrices
 				fScale = m_sCinemaRoomSetup.fMenuScreenScale / m_sCinemaRoomSetup.fRoomScale;
-				D3DXMatrixScaling(&sScale, fScale, fScale, fScale);
+				XMStoreFloat4x4(&sScale, XMMatrixScaling(fScale, fScale, fScale));
 
 				// stuck to HMD yaw (+roll) angle ?
 				if (m_sCinemaRoomSetup.bMenuIsHUD)
 				{
 					// rotate x axis for better reading
 					D3DXMATRIX sTemp;
-					D3DXMatrixRotationX(&sTemp, s_sViewBackup(1, 2));
+					XMStoreFloat4x4(&sTemp, XMMatrixRotationX(s_sViewBackup.m[1][2]));
 					m_sView *= sTemp;
 
 					// translate back from default y 2.0f
-					D3DXMatrixTranslation(&sTrans, 0.0f, -2.0f, m_sCinemaRoomSetup.fMenuScreenDepth);
+					XMStoreFloat4x4(&sTrans, XMMatrixTranslation(0.0f, -2.0f, m_sCinemaRoomSetup.fMenuScreenDepth));
 					m_sView = sScale * sTrans * sTemp;
 				}
 				else
 				{
 					// set view matrix based on view backup
-					D3DXMatrixTranslation(&sTrans, 0.0f, 0.0f, m_sCinemaRoomSetup.fMenuScreenDepth);
-					D3DXMatrixRotationY(&sRotateY, (float)D3DXToRadian((double)m_sCinemaRoomSetup.fMenuScreenRotateY));
+					XMStoreFloat4x4(&sTrans, XMMatrixTranslation(0.0f, 0.0f, m_sCinemaRoomSetup.fMenuScreenDepth));
+					XMStoreFloat4x4(&sRotateY, XMMatrixRotationY((float)D3DXToRadian((double)m_sCinemaRoomSetup.fMenuScreenRotateY)));
 					m_sView = sScale * sTrans * sRotateY * s_sViewBackup;
 				}
 			}
@@ -1979,7 +1979,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 			}
 			else sWorldViewProjection = sWorld * m_sView * m_sToEye[nEye] * m_sProj[nEye];
 
-			D3DXMatrixTranspose(&m_sGeometryConstants.sWorldViewProjection, &sWorldViewProjection);
+			XMStoreFloat4x4(&m_sGeometryConstants.sWorldViewProjection, XMMatrixTranspose(XMLoadFloat4x4(&sWorldViewProjection)));
 			pcContext->UpdateSubresource(m_pcConstantBufferGeometry, 0, NULL, &m_sGeometryConstants, 0, 0);
 
 			// set render target
@@ -1994,7 +1994,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 			m_sView = s_sViewBackup;
 		// set back world matrix after screen got rendered
 		else if (unI == 1)
-			D3DXMatrixScaling(&sWorld, m_sCinemaRoomSetup.fRoomScale, m_sCinemaRoomSetup.fRoomScale, m_sCinemaRoomSetup.fRoomScale);
+			XMStoreFloat4x4(&sWorld, XMMatrixScaling(m_sCinemaRoomSetup.fRoomScale, m_sCinemaRoomSetup.fRoomScale, m_sCinemaRoomSetup.fRoomScale));
 	}
 
 	// set back device
@@ -2028,7 +2028,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 				"return Pos;\n"
 				"}\n";
 			ID3D10Blob* pcShader = nullptr;
-			if (SUCCEEDED(D3DX10CompileFromMemory(V_Shader, strlen(V_Shader), NULL, NULL, NULL, "VS", "vs_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL)))
+			if (SUCCEEDED(D3DCompile(V_Shader, strlen(V_Shader), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL)))
 			{
 				OutputDebugString(L"[TEST!!!!] : Vertex Shader compiled !");
 				if (SUCCEEDED(pcDevice->CreateVertexShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), NULL, &s_pcVS)))
@@ -2060,7 +2060,7 @@ void VireioCinema::RenderD3D11(ID3D11Device* pcDevice, ID3D11DeviceContext* pcCo
 				"return float4(1.0f, 1.0f, 0.0f, 1.0f);    // Yellow, with Alpha = 1\n"
 				"}\n";
 			ID3D10Blob* pcShader = nullptr;
-			if (SUCCEEDED(D3DX10CompileFromMemory(P_Shader, strlen(P_Shader), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL)))
+			if (SUCCEEDED(D3DCompile(P_Shader, strlen(P_Shader), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL)))
 			{
 				OutputDebugString(L"[TEST!!!!] : Pixel Shader compiled !");
 				if (SUCCEEDED(pcDevice->CreatePixelShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), NULL, &s_pcPS)))
@@ -2143,7 +2143,7 @@ void VireioCinema::RenderFullscreenD3D11(ID3D11Device* pcDevice, ID3D11DeviceCon
 	pcContext->IASetIndexBuffer(m_asRenderModels[0].pcIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 
 	// set world matrix and render target resolution
-	D3DXMatrixIdentity(&m_sGeometryConstants.sWorld);
+	XMStoreFloat4x4(&m_sGeometryConstants.sWorld, XMMatrixIdentity());
 	m_sGeometryConstants.sResolution.x = (float)m_asRenderModels[0].sResolution.unWidth;
 	m_sGeometryConstants.sResolution.y = (float)m_asRenderModels[0].sResolution.unHeight;
 
@@ -2158,7 +2158,7 @@ void VireioCinema::RenderFullscreenD3D11(ID3D11Device* pcDevice, ID3D11DeviceCon
 
 		// create view matrix
 		D3DXMATRIX sView;
-		D3DXMatrixTranslation(&sView, -m_sToEye[nEye](3, 0), 0.0f, m_sImmersiveFullscreenSettings.fVSD);
+		XMStoreFloat4x4(&sView, XMMatrixTranslation(-m_sToEye[nEye].m[3][0], 0.0f, m_sImmersiveFullscreenSettings.fVSD));
 
 		// set WVP matrix, update constant buffer
 		D3DXMATRIX sWorldViewProjection;
@@ -2168,7 +2168,7 @@ void VireioCinema::RenderFullscreenD3D11(ID3D11Device* pcDevice, ID3D11DeviceCon
 		}
 		else sWorldViewProjection = sView * m_sToEye[nEye] * m_sProj[nEye];
 
-		D3DXMatrixTranspose(&m_sGeometryConstants.sWorldViewProjection, &sWorldViewProjection);
+		XMStoreFloat4x4(&m_sGeometryConstants.sWorldViewProjection, XMMatrixTranspose(XMLoadFloat4x4(&sWorldViewProjection)));
 		pcContext->UpdateSubresource(m_pcConstantBufferGeometry, 0, NULL, &m_sGeometryConstants, 0, 0);
 
 		// set render target
@@ -2197,11 +2197,11 @@ void VireioCinema::RenderFullscreenD3D11(ID3D11Device* pcDevice, ID3D11DeviceCon
 	{
 		// set view matrix based on view backup..translate back from default y 2.0f...scale to 0.5f
 		D3DXMATRIX sTrans;
-		D3DXMatrixTranslation(&sTrans, 0.0f, -2.0f, 0.0f);
+		XMStoreFloat4x4(&sTrans, XMMatrixTranslation(0.0f, -2.0f, 0.0f));
 		D3DXMATRIX sScale;
-		D3DXMatrixScaling(&sScale, 0.5f, 0.5f, 0.5f);
+		XMStoreFloat4x4(&sScale, XMMatrixScaling(0.5f, 0.5f, 0.5f));
 		D3DXMATRIX sView;
-		D3DXMatrixTranslation(&sView, -m_sToEye[nEye](3, 0), 0.0f, m_sImmersiveFullscreenSettings.fVSD * 0.9f);
+		XMStoreFloat4x4(&sView, XMMatrixTranslation(-m_sToEye[nEye].m[3][0], 0.0f, m_sImmersiveFullscreenSettings.fVSD * 0.9f));
 		D3DXMATRIX sWorldViewProjection;
 		if (m_psTrackerData)
 		{
@@ -2209,7 +2209,7 @@ void VireioCinema::RenderFullscreenD3D11(ID3D11Device* pcDevice, ID3D11DeviceCon
 		}
 		else sWorldViewProjection = sTrans * sScale * sView * m_sToEye[nEye] * m_sProj[nEye];
 
-		D3DXMatrixTranspose(&m_sGeometryConstants.sWorldViewProjection, &sWorldViewProjection);
+		XMStoreFloat4x4(&m_sGeometryConstants.sWorldViewProjection, XMMatrixTranspose(XMLoadFloat4x4(&sWorldViewProjection)));
 		pcContext->UpdateSubresource(m_pcConstantBufferGeometry, 0, NULL, &m_sGeometryConstants, 0, 0);
 
 		// set render target

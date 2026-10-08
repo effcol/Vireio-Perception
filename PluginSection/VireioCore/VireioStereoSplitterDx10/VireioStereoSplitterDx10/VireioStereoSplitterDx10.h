@@ -1,4 +1,4 @@
-﻿/********************************************************************
+/********************************************************************
 Vireio Perception: Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
@@ -56,9 +56,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <d3d10.h>
 #pragma comment(lib, "d3d10.lib")
 
-#include <d3dx10.h>
-#pragma comment(lib, "d3dx10.lib")
-
+// Legacy <d3dx10.h> removed; types from Vireio_D3DX_Compat.h
+#include "..\..\..\Include\Vireio_D3DX_Compat.h"
 #include "directxmath.h"
 
 #define VIREIO_D3D11
@@ -149,13 +148,13 @@ public:
 	/*** AQU_Nodus public methods ***/
 	virtual const char* GetNodeType();
 	virtual        UINT GetNodeTypeId();
-	virtual      LPWSTR GetCategory();
+	virtual      LPCWSTR GetCategory();
 	virtual     HBITMAP GetLogo();
 	virtual      ImVec2 GetNodeSize() { return ImVec2((float)g_uGlobalNodeWidth, (float)128); }
 	virtual       DWORD GetCommandersNumber() { return NUMBER_OF_COMMANDERS; }
 	virtual       DWORD GetDecommandersNumber() { return NUMBER_OF_DECOMMANDERS; }
-	virtual      LPWSTR GetCommanderName(DWORD uCommanderIndex);
-	virtual      LPWSTR GetDecommanderName(DWORD uDecommanderIndex);
+	virtual      LPCWSTR GetCommanderName(DWORD uCommanderIndex);
+	virtual      LPCWSTR GetDecommanderName(DWORD uDecommanderIndex);
 	virtual       DWORD GetCommanderType(DWORD uCommanderIndex);
 	virtual       DWORD GetDecommanderType(DWORD uDecommanderIndex);
 	virtual       void* GetOutputPointer(DWORD uCommanderIndex);

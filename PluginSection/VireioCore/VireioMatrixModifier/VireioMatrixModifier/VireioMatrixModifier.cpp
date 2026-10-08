@@ -209,7 +209,7 @@ UINT MatrixModifier::GetNodeTypeId()
 /// <summary> 
 /// Returns the name of the category for the Matrix Modifier node.
 /// </summary>
-LPWSTR MatrixModifier::GetCategory()
+LPCWSTR MatrixModifier::GetCategory()
 {
 	return L"Vireio Core";
 }
@@ -586,7 +586,7 @@ void MatrixModifier::InitNodeData(char* pData, UINT dwSizeOfData)
 /// <summary> 
 /// Provides the name of the requested commander.
 /// </summary>
-LPWSTR MatrixModifier::GetCommanderName(DWORD dwCommanderIndex)
+LPCWSTR MatrixModifier::GetCommanderName(DWORD dwCommanderIndex)
 {
 	switch ((STS_Commanders)dwCommanderIndex)
 	{
@@ -602,7 +602,7 @@ LPWSTR MatrixModifier::GetCommanderName(DWORD dwCommanderIndex)
 /// <summary> 
 /// Provides the name of the requested decommander.
 /// </summary>
-LPWSTR MatrixModifier::GetDecommanderName(DWORD dwDecommanderIndex)
+LPCWSTR MatrixModifier::GetDecommanderName(DWORD dwDecommanderIndex)
 {
 #if defined(VIREIO_D3D11) || defined(VIREIO_D3D10)
 	switch ((STS_Decommanders)dwDecommanderIndex)
@@ -4684,11 +4684,11 @@ HRESULT MatrixModifier::SetTransform(int& nFlags)
 
 		if (m_sModifierData.eCurrentRenderingSide == RenderPosition::Left)
 		{
-			nHr = m_pcDeviceCurrent->SetTransform(*peState, &m_sModifierData.sMatView[0]);
+			nHr = m_pcDeviceCurrent->SetTransform(*peState, reinterpret_cast<const D3DMATRIX*>(&m_sModifierData.sMatView[0]));
 		}
 		else
 		{
-			nHr = m_pcDeviceCurrent->SetTransform(*peState, &m_sModifierData.sMatView[1]);
+			nHr = m_pcDeviceCurrent->SetTransform(*peState, reinterpret_cast<const D3DMATRIX*>(&m_sModifierData.sMatView[1]));
 		}
 	}
 	else if ((*peState) == D3DTS_PROJECTION)
@@ -4728,11 +4728,11 @@ HRESULT MatrixModifier::SetTransform(int& nFlags)
 
 		if (m_sModifierData.eCurrentRenderingSide == RenderPosition::Left)
 		{
-			nHr = m_pcDeviceCurrent->SetTransform(*peState, &m_sModifierData.sMatProj[0]);
+			nHr = m_pcDeviceCurrent->SetTransform(*peState, reinterpret_cast<const D3DMATRIX*>(&m_sModifierData.sMatProj[0]));
 		}
 		else
 		{
-			nHr = m_pcDeviceCurrent->SetTransform(*peState, &m_sModifierData.sMatProj[1]);
+			nHr = m_pcDeviceCurrent->SetTransform(*peState, reinterpret_cast<const D3DMATRIX*>(&m_sModifierData.sMatProj[1]));
 		}
 	}
 	// if D3DTS_WORLD matrix is set do not replace the call

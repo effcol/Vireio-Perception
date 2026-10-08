@@ -184,7 +184,7 @@ UINT StereoPresenter::GetNodeTypeId()
 /// <summary>
 ///Returns the name of the category for the Stereo Presenter node.
 /// </summary>
-LPWSTR StereoPresenter::GetCategory()
+LPCWSTR StereoPresenter::GetCategory()
 {
 	return L"Vireio Core";
 }
@@ -202,7 +202,7 @@ HBITMAP StereoPresenter::GetLogo()
 /// <summary>
 /// Provides the name of the requested commander.
 /// </summary>
-LPWSTR StereoPresenter::GetCommanderName(DWORD dwCommanderIndex)
+LPCWSTR StereoPresenter::GetCommanderName(DWORD dwCommanderIndex)
 {
 	return L"UNTITLED";
 }
@@ -210,7 +210,7 @@ LPWSTR StereoPresenter::GetCommanderName(DWORD dwCommanderIndex)
 /// <summary>
 /// Provides the name of the requested decommander.
 /// </summary>
-LPWSTR StereoPresenter::GetDecommanderName(DWORD dwDecommanderIndex)
+LPCWSTR StereoPresenter::GetDecommanderName(DWORD dwDecommanderIndex)
 {
 	switch ((STP_Decommanders)dwDecommanderIndex)
 	{

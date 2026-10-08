@@ -3,7 +3,7 @@ Vireio Perception : Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
 Aquilinus : Vireio Perception 3D Modification Studio 
-Copyright © 2014 Denis Reischl
+Copyright ï¿½ 2014 Denis Reischl
 
 Vireio Perception Version History:
 v1.0.0 2012 by Andres Hernandez
@@ -30,7 +30,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #ifndef NOD_MATHOPERATIONS
 #define NOD_MATHOPERATIONS
 
-#include <d3dx9.h>
+// Legacy <d3dx9.h> removed in v4.1; types from Vireio_D3DX_Compat.h.
+#include "..\..\PluginSection\Include\Vireio_D3DX_Compat.h"
 
 #ifndef _TRACE
 #define TRACE_UINT(a) { wchar_t buf[128]; wsprintf(buf, L"%s:%u", L#a, a); OutputDebugString(buf); }

@@ -189,9 +189,12 @@ void AddSolidColorBox(float x1, float y1, float z1, float x2, float y2, float z2
 	for(int v = 0; v < 24; v++)
 	{
 		TexColoredVertex vvv; vvv.Pos = Vert[v][0];  vvv.U = Vert[v][1].x; vvv.V = Vert[v][1].y;
-		float dist1 = D3DXVec3Length(&(vvv.Pos - D3DXVECTOR3(-2,4,-2)));
-		float dist2 = D3DXVec3Length(&(vvv.Pos - D3DXVECTOR3(3,4,-3)));
-		float dist3 = D3DXVec3Length(&(vvv.Pos - D3DXVECTOR3(-4,3,25)));
+		auto _dist = [](const DirectX::XMFLOAT3& v) {
+			return DirectX::XMVectorGetX(DirectX::XMVector3Length(DirectX::XMLoadFloat3(&v)));
+		};
+		float dist1 = _dist(vvv.Pos - D3DXVECTOR3(-2,4,-2));
+		float dist2 = _dist(vvv.Pos - D3DXVECTOR3(3,4,-3));
+		float dist3 = _dist(vvv.Pos - D3DXVECTOR3(-4,3,25));
 		int   bri   = rand() % 160;
 		float RRR   = (c.r * 255.0f) * (bri + 192.0f*(0.65f + 8/dist1 + 1/dist2 + 4/dist3)) / 255.0f;
 		float GGG   = (c.g * 255.0f) * (bri + 192.0f*(0.65f + 8/dist1 + 1/dist2 + 4/dist3)) / 255.0f;

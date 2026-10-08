@@ -40,7 +40,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include<d3d10_1.h>
 #include<d3d10.h>
 #include<d3d9.h>
-#include<d3dx9.h>
+// legacy <d3dx9.h> removed; D3DX types from Vireio_D3DX_Compat.h
+#include"..\..\..\Include\Vireio_D3DX_Compat.h"
 #include<stdio.h>
 #include<vector>
 #include<string>

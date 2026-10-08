@@ -139,7 +139,7 @@ UINT StereoSplitter::GetNodeTypeId()
 /// <summary>
 /// Returns the name of the category for the Stereo Splitter node.
 /// </summary>
-LPWSTR StereoSplitter::GetCategory()
+LPCWSTR StereoSplitter::GetCategory()
 {
 	return L"Vireio Core";
 }
@@ -161,7 +161,7 @@ HBITMAP StereoSplitter::GetLogo()
 /// <summary>
 /// Provides the name of the requested commander.
 /// </summary>
-LPWSTR StereoSplitter::GetCommanderName(DWORD uCommanderIndex)
+LPCWSTR StereoSplitter::GetCommanderName(DWORD uCommanderIndex)
 {
 	switch ((STS_Commanders)uCommanderIndex)
 	{
@@ -177,7 +177,7 @@ LPWSTR StereoSplitter::GetCommanderName(DWORD uCommanderIndex)
 /// <summary>
 /// Provides the name of the requested decommander.
 /// </summary>
-LPWSTR StereoSplitter::GetDecommanderName(DWORD uDecommanderIndex)
+LPCWSTR StereoSplitter::GetDecommanderName(DWORD uDecommanderIndex)
 {
 	switch ((STS_Decommanders)uDecommanderIndex)
 	{

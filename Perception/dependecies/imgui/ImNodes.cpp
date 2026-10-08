@@ -26,6 +26,9 @@
 
 #include "ImNodes.h"
 
+#include <cmath>
+#include <limits>
+
 namespace ImNodes
 {
 
@@ -33,8 +36,8 @@ CanvasState* gCanvas = nullptr;
 
 bool operator ==(const ImVec2& a, const ImVec2& b)
 {
-    return abs(a.x - b.x) < std::numeric_limits<float>::epsilon() &&
-           abs(a.y - b.y) < std::numeric_limits<float>::epsilon();
+    return std::abs(a.x - b.x) < std::numeric_limits<float>::epsilon() &&
+           std::abs(a.y - b.y) < std::numeric_limits<float>::epsilon();
 }
 
 enum _ImNodesState

@@ -3,7 +3,7 @@ Vireio Perception : Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
 Aquilinus : Vireio Perception 3D Modification Studio
-Copyright © 2014 Denis Reischl
+Copyright ï¿½ 2014 Denis Reischl
 
 Vireio Perception Version History:
 v1.0.0 2012 by Andres Hernandez
@@ -68,7 +68,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 /// <summary>
 /// Debug console helper
 /// </summary>
-void OutputDebug(char* lpszFormat, ...)
+void OutputDebug(const char* lpszFormat, ...)
 {
 	char szBuffer[512];
 	int nBuf;
@@ -102,7 +102,7 @@ inline bool bCompare(const BYTE* pData, const BYTE* bMask, const char* szMask)
 /// <param name="bMaskara"></param>
 /// <param name="szMaskara"></param>
 /// </summary>
-inline UINT_PTR FindPattern(UINT_PTR dValor, UINT_PTR dLer, BYTE* bMaskara, char* szMaskara)
+inline UINT_PTR FindPattern(UINT_PTR dValor, UINT_PTR dLer, BYTE* bMaskara, const char* szMaskara)
 {
 	for (UINT_PTR i = 0; i < dLer; i++)
 		if (bCompare((PBYTE)(dValor + i), bMaskara, szMaskara))

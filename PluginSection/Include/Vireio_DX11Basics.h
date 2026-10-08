@@ -44,6 +44,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #endif
 
 #include <DirectXMath.h>
+#include "Vireio_D3DX_Compat.h"
+#include <d3dcompiler.h>
+#pragma comment(lib, "d3dcompiler.lib")
 #include <stdio.h>
 #include <stdlib.h>
 #include <string>
@@ -2560,12 +2563,12 @@ public:
 		}
 
 		// set first matrices
-		D3DXMatrixIdentity(&m_sWorld);
-		D3DXMatrixIdentity(&m_sView);
+		XMStoreFloat4x4(&m_sWorld, XMMatrixIdentity());
+		XMStoreFloat4x4(&m_sView, XMMatrixIdentity());
 
 		// we use a simple left handed projection matrix for text...
 		const float fPi = 3.1415926535f;
-		D3DXMatrixPerspectiveFovLH(&m_sProj, 0.25f * fPi, fAspect, 1.0f, 1000.0f);
+		XMStoreFloat4x4(&m_sProj, XMMatrixPerspectiveFovLH(0.25f * fPi, fAspect, 1.0f, 1000.0f));
 
 		// Set constants
 		ZeroMemory(&m_sConstantBuffer0, sizeof(GeometryConstantBuffer));
@@ -2685,7 +2688,7 @@ public:
 		D3DXVECTOR3 sTarget = D3DXVECTOR3(0.0f, 0.01f, 0.0f);
 		D3DXVECTOR3 sUp = D3DXVECTOR3(0.0f, 1.0f, 0.0f);
 
-		D3DXMatrixLookAtLH(&m_sView, &sPos, &sTarget, &sUp);
+		XMStoreFloat4x4(&m_sView, XMMatrixLookAtLH(XMLoadFloat3(&sPos), XMLoadFloat3(&sTarget), XMLoadFloat3(&sUp)));
 	}
 
 	/// <summary>
@@ -2785,11 +2788,11 @@ public:
 			// update matrices
 			fXTranslate += m_asGlyphConstants[ch].fXAdvance;
 			D3DXMATRIX world, view, proj;
-			D3DXMatrixTranslation(&world, fXTranslate, fY, fZ);
-			D3DXMatrixTranspose(&m_sConstantBuffer0.sWorld, &world);
+			XMStoreFloat4x4(&world, XMMatrixTranslation(fXTranslate, fY, fZ));
+			XMStoreFloat4x4(&m_sConstantBuffer0.sWorld, XMMatrixTranspose(XMLoadFloat4x4(&world)));
 			D3DXMATRIX wvp;
 			wvp = world * m_sView * m_sProj;
-			D3DXMatrixTranspose(&m_sConstantBuffer0.sWorldViewProjection, &wvp);
+			XMStoreFloat4x4(&m_sConstantBuffer0.sWorldViewProjection, XMMatrixTranspose(XMLoadFloat4x4(&wvp)));
 
 			// update constant buffers
 			pcContext->UpdateSubresource(m_pcConstantBuffer0, 0, 0, &m_sConstantBuffer0, 0, 0);
@@ -2915,13 +2918,13 @@ HRESULT CreateVertexShaderTechnique(ID3D11Device* pcDevice, ID3D11VertexShader**
 	switch (eTechnique)
 	{
 	case PosUV2D:
-		hr = D3DX10CompileFromMemory(VS2D, strlen(VS2D), NULL, NULL, NULL, "VS", "vs_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(VS2D, strlen(VS2D), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case PosNormUV:
-		hr = D3DX10CompileFromMemory(VS3D, strlen(VS3D), NULL, NULL, NULL, "VS", "vs_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(VS3D, strlen(VS3D), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case PosNormUV_Text:
-		hr = D3DX10CompileFromMemory(VS3D_TEXT, strlen(VS3D_TEXT), NULL, NULL, NULL, "VS", "vs_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(VS3D_TEXT, strlen(VS3D_TEXT), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL);
 		break;
 	default:
 		break;
@@ -2996,73 +2999,73 @@ HRESULT CreatePixelShaderEffect(ID3D11Device* pcDevice, ID3D11PixelShader** ppcP
 	switch (eTechnique)
 	{
 	case FullscreenSimple:
-		hr = D3DX10CompileFromMemory(PS2D, strlen(PS2D), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS2D, strlen(PS2D), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case WarpSimple:
-		hr = D3DX10CompileFromMemory(PS_WARP_SIMPLE, strlen(PS_WARP_SIMPLE), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_WARP_SIMPLE, strlen(PS_WARP_SIMPLE), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case DistortSimple:
-		hr = D3DX10CompileFromMemory(PS_DIST_SIMPLE, strlen(PS_DIST_SIMPLE), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_DIST_SIMPLE, strlen(PS_DIST_SIMPLE), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case FullscreenGammaCorrection:
-		hr = D3DX10CompileFromMemory(PS2D_GAMMA_CORRECTION, strlen(PS2D_GAMMA_CORRECTION), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS2D_GAMMA_CORRECTION, strlen(PS2D_GAMMA_CORRECTION), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case GeometryDiffuseTextured:
-		hr = D3DX10CompileFromMemory(PS3D, strlen(PS3D), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS3D, strlen(PS3D), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case GeometryDiffuseTexturedMouse:
-		hr = D3DX10CompileFromMemory(PS3D_MOUSE, strlen(PS3D_MOUSE), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS3D_MOUSE, strlen(PS3D_MOUSE), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case Fabric:
-		hr = D3DX10CompileFromMemory(PS3D_FABRIC, strlen(PS3D_FABRIC), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS3D_FABRIC, strlen(PS3D_FABRIC), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case BumpComputeNormal:
-		hr = D3DX10CompileFromMemory(PS3D_BUMP, strlen(PS3D_BUMP), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS3D_BUMP, strlen(PS3D_BUMP), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case StringTheory:
-		hr = D3DX10CompileFromMemory(PS_STRING_THEORY, strlen(PS_STRING_THEORY), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_STRING_THEORY, strlen(PS_STRING_THEORY), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case Bubbles:
-		hr = D3DX10CompileFromMemory(PS_BUBBLES, strlen(PS_BUBBLES), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_BUBBLES, strlen(PS_BUBBLES), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case C64Plasma:
-		hr = D3DX10CompileFromMemory(PS_C64_PLASMA, strlen(PS_C64_PLASMA), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_C64_PLASMA, strlen(PS_C64_PLASMA), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case ToonCloud:
-		hr = D3DX10CompileFromMemory(PS_TOON_CLOUD, strlen(PS_TOON_CLOUD), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_TOON_CLOUD, strlen(PS_TOON_CLOUD), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case Worley01:
-		hr = D3DX10CompileFromMemory(PS_WORLEY_01, strlen(PS_WORLEY_01), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_WORLEY_01, strlen(PS_WORLEY_01), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case WaterCaustic:
-		hr = D3DX10CompileFromMemory(PS_WATER_CAUSTIC, strlen(PS_WATER_CAUSTIC), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_WATER_CAUSTIC, strlen(PS_WATER_CAUSTIC), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case HypnoticDisco:
-		hr = D3DX10CompileFromMemory(PS_HYPNOTIC_DISCO, strlen(PS_HYPNOTIC_DISCO), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_HYPNOTIC_DISCO, strlen(PS_HYPNOTIC_DISCO), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case Planets:
-		hr = D3DX10CompileFromMemory(PS_PLANETS, strlen(PS_PLANETS), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_PLANETS, strlen(PS_PLANETS), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case VoronoiSmooth:
-		hr = D3DX10CompileFromMemory(PS_VORONOI_SMOOTH, strlen(PS_VORONOI_SMOOTH), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_VORONOI_SMOOTH, strlen(PS_VORONOI_SMOOTH), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case TextFX_001:
-		hr = D3DX10CompileFromMemory(PS_TEXT_FX_001, strlen(PS_TEXT_FX_001), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_TEXT_FX_001, strlen(PS_TEXT_FX_001), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case MenuScreen:
-		hr = D3DX10CompileFromMemory(PS_MENU_SCREEN, strlen(PS_MENU_SCREEN), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_MENU_SCREEN, strlen(PS_MENU_SCREEN), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case TextFX_002:
-		hr = D3DX10CompileFromMemory(PS_TEXT_FX_002, strlen(PS_TEXT_FX_002), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_TEXT_FX_002, strlen(PS_TEXT_FX_002), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case ScreenFilter:
-		hr = D3DX10CompileFromMemory(PS_SCREEN_FILTER, strlen(PS_SCREEN_FILTER), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_SCREEN_FILTER, strlen(PS_SCREEN_FILTER), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case ScreenSharpen:
-		hr = D3DX10CompileFromMemory(PS_SCREEN_SHARPEN, strlen(PS_SCREEN_SHARPEN), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_SCREEN_SHARPEN, strlen(PS_SCREEN_SHARPEN), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	case ScreenLevelFilter:
-		hr = D3DX10CompileFromMemory(PS_SCREEN_LEVEL_FILTER, strlen(PS_SCREEN_LEVEL_FILTER), NULL, NULL, NULL, "PS", "ps_4_0", NULL, NULL, NULL, &pcShader, NULL, NULL);
+		hr = D3DCompile(PS_SCREEN_LEVEL_FILTER, strlen(PS_SCREEN_LEVEL_FILTER), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL);
 		break;
 	default:
 		return E_INVALIDARG;
@@ -3121,7 +3124,7 @@ HRESULT CreateMatrixConstantBuffer(ID3D11Device* pcDevice, ID3D11Buffer** ppcBuf
 {
 	// init data
 	D3DXMATRIX sWorldViewProj;
-	D3DXMatrixIdentity(&sWorldViewProj);
+	XMStoreFloat4x4(&sWorldViewProj, XMMatrixIdentity());
 
 	// Fill in a buffer description.
 	D3D11_BUFFER_DESC cbDesc;
@@ -3267,9 +3270,9 @@ inline DXGI_FORMAT GetDXGI_Format(D3DFORMAT eInputFormat)
 	case D3DFMT_R8G8B8:
 		return DXGI_FORMAT_UNKNOWN; //	Not available
 	case D3DFMT_A8R8G8B8:
-		return DXGI_FORMAT_B8G8R8A8_UNORM; // or DXGI_FORMAT_B8G8R8A8_UNORM_SRGB¹
+		return DXGI_FORMAT_B8G8R8A8_UNORM; // or DXGI_FORMAT_B8G8R8A8_UNORM_SRGBï¿½
 	case D3DFMT_X8R8G8B8:
-		return DXGI_FORMAT_B8G8R8X8_UNORM; // or DXGI_FORMAT_B8G8R8X8_UNORM_SRGB¹
+		return DXGI_FORMAT_B8G8R8X8_UNORM; // or DXGI_FORMAT_B8G8R8X8_UNORM_SRGBï¿½
 	case D3DFMT_R5G6B5:
 		return DXGI_FORMAT_B5G6R5_UNORM;
 	case D3DFMT_X1R5G5B5:

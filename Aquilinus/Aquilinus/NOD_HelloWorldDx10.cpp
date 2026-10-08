@@ -3,7 +3,7 @@ Vireio Perception : Open-Source Stereoscopic 3D Driver
 Copyright (C) 2012 Andres Hernandez
 
 Aquilinus : Vireio Perception 3D Modification Studio 
-Copyright © 2014 Denis Reischl
+Copyright ï¿½ 2014 Denis Reischl
 
 Vireio Perception Version History:
 v1.0.0 2012 by Andres Hernandez
@@ -30,6 +30,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include"NOD_HelloWorldDx10.h"
 #include"AQU_GlobalTypes.h"
 #include"Resources.h"
+// v4.1 modernization: D3DX10CompileFromMemory -> D3DCompile from d3dcompiler.h
+#include <d3dcompiler.h>
+#pragma comment(lib, "d3dcompiler.lib")
 
 /**
 * Simple texture vertex structure.
@@ -228,7 +231,7 @@ void* NOD_HelloWorldDx10::Provoke(void* pcThis, int eD3D, int eD3DInterface, int
 				ID3D10Blob* pcShader;
 
 				// compile and create shader
-				if (SUCCEEDED(D3DX10CompileFromMemory(VS2DFont,strlen(VS2DFont),NULL,NULL,NULL,"VS","vs_4_0",NULL,NULL,NULL, &pcShader,NULL,NULL)))
+				if (SUCCEEDED(D3DCompile(VS2DFont, strlen(VS2DFont), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL)))
 				{
 					OutputDebugString(L"HelloWorldDx10 Node : Vertex Shader compiled !");
 					pcDevice->CreateVertexShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), &m_pcVertexShader);
@@ -259,7 +262,7 @@ void* NOD_HelloWorldDx10::Provoke(void* pcThis, int eD3D, int eD3DInterface, int
 				ID3D10Blob* pcShader;
 
 				// compile and create shader
-				if (SUCCEEDED(D3DX10CompileFromMemory(PS2DFont,strlen(PS2DFont),NULL,NULL,NULL,"PS","ps_4_0",NULL,NULL,NULL, &pcShader,NULL,NULL)))
+				if (SUCCEEDED(D3DCompile(PS2DFont, strlen(PS2DFont), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL)))
 				{
 					OutputDebugString(L"HelloWorldDx10 Node : Pixel Shader compiled !");
 					pcDevice->CreatePixelShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), &m_pcPixelShader);
@@ -486,7 +489,7 @@ void* NOD_HelloWorldDx10::Provoke(void* pcThis, int eD3D, int eD3DInterface, int
 				ID3D10Blob* pcShader;
 
 				// compile and create shader
-				if (SUCCEEDED(D3DX10CompileFromMemory(VS2DFont,strlen(VS2DFont),NULL,NULL,NULL,"VS","vs_4_0",NULL,NULL,NULL, &pcShader,NULL,NULL)))
+				if (SUCCEEDED(D3DCompile(VS2DFont, strlen(VS2DFont), NULL, NULL, NULL, "VS", "vs_4_0", 0, 0, &pcShader, NULL)))
 				{
 					OutputDebugString(L"HelloWorldDx10 Node : Vertex Shader compiled !");
 					pcDevice->CreateVertexShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), NULL, &m_pcVertexShader11);
@@ -517,7 +520,7 @@ void* NOD_HelloWorldDx10::Provoke(void* pcThis, int eD3D, int eD3DInterface, int
 				ID3D10Blob* pcShader;
 
 				// compile and create shader
-				if (SUCCEEDED(D3DX10CompileFromMemory(PS2DFont,strlen(PS2DFont),NULL,NULL,NULL,"PS","ps_4_0",NULL,NULL,NULL, &pcShader,NULL,NULL)))
+				if (SUCCEEDED(D3DCompile(PS2DFont, strlen(PS2DFont), NULL, NULL, NULL, "PS", "ps_4_0", 0, 0, &pcShader, NULL)))
 				{
 					OutputDebugString(L"HelloWorldDx10 Node : Pixel Shader compiled !");
 					pcDevice->CreatePixelShader(pcShader->GetBufferPointer(), pcShader->GetBufferSize(), NULL, &m_pcPixelShader11);

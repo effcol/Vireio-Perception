@@ -2,6 +2,7 @@
 *.dll
 *.lib
 *.def
+!Exports.def
 *.exp
 
 #################

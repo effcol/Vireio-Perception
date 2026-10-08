@@ -1,0 +1,24 @@
+; Module-definition file for d3d9.dll (Vireio Perception v5 DxProxy).
+; The DLL masquerades as d3d9.dll — it's renamed/dropped next to a DX9
+; game's exe and Windows's DLL-search-order loads it instead of the
+; system one. We forward to %SystemRoot%\System32\d3d9.dll inside
+; Direct3DCreate9 / Direct3DCreate9Ex.
+
+; Module-definition file for the v5 d3d9.dll proxy. Both entry points
+; wrap and forward to the system d3d9.dll (loaded by Main.cpp's LoadDll()
+; from %SystemRoot%\System32\). Games that use IDirect3D9Ex (Skyrim SE
+; launcher, some UE3 titles) load via Direct3DCreate9Ex; everything else
+; uses Direct3DCreate9.
+;
+; D3DPERF_* functions are PIX-debugger no-ops in modern Windows; included
+; to keep the export shape compatible with games that GetProcAddress them.
+EXPORTS
+    Direct3DCreate9          @1
+    Direct3DCreate9Ex        @2
+    D3DPERF_BeginEvent       @3
+    D3DPERF_EndEvent         @4
+    D3DPERF_SetMarker        @5
+    D3DPERF_SetRegion        @6
+    D3DPERF_QueryRepeatFrame @7
+    D3DPERF_SetOptions       @8
+    D3DPERF_GetStatus        @9

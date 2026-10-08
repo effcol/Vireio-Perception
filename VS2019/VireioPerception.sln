@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30804.86
+# Visual Studio Version 18
+VisualStudioVersion = 18.6.3.22110
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Aquilinus", "..\Aquilinus\Aquilinus\VS2019\Aquilinus.vcxproj", "{446063BD-E949-4F83-BE26-2188947FADED}"
 EndProject
@@ -22,6 +22,10 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "VireioStereoSplitterDx11", "..\PluginSection\VireioCore\VireioStereoSplitterDx10\VireioStereoSplitterDx10\VS2019\VireioStereoSplitterDx11.vcxproj", "{1927D2CC-B50D-4706-8AA7-17BD229F5987}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Perception", "..\Perception\VS2019\Perception\Perception.vcxproj", "{16F92FCD-5E89-45F4-A728-4F7AE6408896}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FreeTrackTracker", "..\PluginSection\MotionTracker\FreeTrackTracker\FreeTrackTracker\VS2019\FreeTrackTracker.vcxproj", "{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "OpenXR-DirectMode", "..\PluginSection\Renderer\OpenXR-DirectMode\OpenXR-DirectMode\VS2019\OpenXR-DirectMode.vcxproj", "{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -153,6 +157,30 @@ Global
 		{16F92FCD-5E89-45F4-A728-4F7AE6408896}.Release|x64.Build.0 = Release|x64
 		{16F92FCD-5E89-45F4-A728-4F7AE6408896}.Release|x86.ActiveCfg = Release|Win32
 		{16F92FCD-5E89-45F4-A728-4F7AE6408896}.Release|x86.Build.0 = Release|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Debug|x64.ActiveCfg = Debug|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Debug|x64.Build.0 = Debug|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Debug|x86.ActiveCfg = Debug|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Debug|x86.Build.0 = Debug|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Developer|x64.ActiveCfg = Release|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Developer|x64.Build.0 = Release|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Developer|x86.ActiveCfg = Release|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Developer|x86.Build.0 = Release|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Release|x64.ActiveCfg = Release|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Release|x64.Build.0 = Release|x64
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Release|x86.ActiveCfg = Release|Win32
+		{8B7E6F1A-FE24-4F35-B9D2-1E5DAA1C2B40}.Release|x86.Build.0 = Release|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Debug|x64.ActiveCfg = Debug|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Debug|x64.Build.0 = Debug|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Debug|x86.ActiveCfg = Debug|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Debug|x86.Build.0 = Debug|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Developer|x64.ActiveCfg = Release|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Developer|x64.Build.0 = Release|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Developer|x86.ActiveCfg = Release|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Developer|x86.Build.0 = Release|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Release|x64.ActiveCfg = Release|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Release|x64.Build.0 = Release|x64
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Release|x86.ActiveCfg = Release|Win32
+		{2C5FA712-9D38-4C49-8B61-7C3A0F1A8E72}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
